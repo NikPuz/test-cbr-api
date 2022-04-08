@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  nats:
+    container_name: "nats-server"
+    image: 'nats:2.7.4'
+    expose:
+      - "4222"
+    ports:
+      - "4222:4222"
+    hostname: nats-server
+    restart: always
+
+  servise_a:
+    container_name: "servise_a"
+    env_file:
+      - ./Service-A/config/app.env
+    build:
+      context: ./Service-A
+      dockerfile: "Dockerfile"
+    restart: always
+    depends_on:
+      - servise_b
+
+  servise_b:
+    container_name: "servise_b"
+    env_file:
+      - ./Service-B/config/app.env
+    build:
+      context: ./Service-B
+      dockerfile: "Dockerfile"
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - nats

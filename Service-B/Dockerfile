@@ -1,0 +1,19 @@
+FROM rhaps1071/golang-1.14-alpine-git AS build
+
+WORKDIR /build
+
+COPY . .
+
+RUN CGO_ENABLED=0 go build -ldflags "-s -w -extldflags '-static'" -o main ./cmd/server/main.go
+
+FROM alpine:3.14.0
+
+WORKDIR /build/app/
+
+COPY --from=build /build/ .
+
+COPY /config .
+
+EXPOSE ${APP_PORT}
+
+CMD /build/app/main
