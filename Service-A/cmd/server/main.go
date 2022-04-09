@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
 	"test-service-a/internal/cbr_api"
 	"time"
 
@@ -10,6 +13,7 @@ import (
 )
 
 func main() {
+	fmt.Println("поехало")
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("panic recovery.", r)
@@ -24,7 +28,9 @@ func main() {
 
 	go startNatsGetWithDelay(logger)
 
-	fmt.Scanf(" ")
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	<-c
 }
 
 func initViperConfigger(logger *zap.Logger) {

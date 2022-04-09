@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sync"
 	"time"
@@ -19,8 +18,6 @@ import (
 
 func main() {
 
-	fmt.Println("Поехало!")
-
 	logger := initZapLogger()
 
 	initViperConfigger(logger)
@@ -35,7 +32,7 @@ func main() {
 
 	nc, err := nats.Connect(viper.GetString("NATS_CONNECT"))
 	if err != nil {
-		fmt.Println(err)
+		logger.Error("Error Connect to nats", zap.Error(err))
 	}
 
 	nc.Subscribe("ValCurs", func(msg *nats.Msg) {
@@ -45,7 +42,6 @@ func main() {
 		}
 		mutex.Lock()
 		courseValues = append(courseValues, valCurs)
-		fmt.Println(courseValues)
 		mutex.Unlock()
 	})
 	nc.Flush()
@@ -75,7 +71,6 @@ func initViperConfigger(logger *zap.Logger) {
 	viper.AddConfigPath("config/.")
 	err := viper.ReadInConfig()
 	if err != nil {
-		fmt.Print(err)
 		logger.Error("failed read in config", zap.Error(err))
 		return
 	}
