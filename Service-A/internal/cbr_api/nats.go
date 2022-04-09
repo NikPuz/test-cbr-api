@@ -51,7 +51,7 @@ func NatsGetWithDelay(logger *zap.Logger, delay time.Duration, cbr_url string) {
 		nc.Publish("ValCurs", jsonValCurs)
 		nc.Close()
 
-		logger.Info("NatsGetWithDelay", zap.String(("message"), time.Now().Format("02 Jan 06 15:04:05.999")), zap.Duration("delay", delay))
+		logger.Info("NatsGetWithDelay", zap.String(("time"), time.Now().Format("02 Jan 06 15:04:05.999")), zap.Duration("delay", delay))
 
 		time.Sleep(delay*time.Duration(i) - time.Since(startTime))
 	}
@@ -65,7 +65,8 @@ func NatsGetEveryday(logger *zap.Logger, requestTime time.Time, cbr_url string) 
 	if startTime.After(requestTime) {
 		requestTime = requestTime.Add(time.Hour * 24)
 	}
-	
+
+	logger.Info("NatsGetEveryday", zap.String(("time"), time.Now().Format("02 Jan 06 15:04:05.999")), zap.Duration("Next", time.Until(requestTime)))
 	time.Sleep(time.Until(requestTime))
 	startTime = time.Now()
 	var timeOut int // Длительность паузы при ошибке
@@ -102,7 +103,7 @@ func NatsGetEveryday(logger *zap.Logger, requestTime time.Time, cbr_url string) 
 		nc.Publish("ValCurs", jsonValCurs)
 		nc.Close()
 
-		logger.Info("NatsGetEveryday", zap.String("message", time.Now().Format("02 Jan 06 15:04:05.999")))
+		logger.Info("NatsGetEveryday", zap.String("time", time.Now().Format("02 Jan 06 15:04:05.999")), zap.Duration("Next", time.Hour*24*time.Duration(time.Since(startTime).Hours()*24+1)-time.Since(startTime)))
 
 		time.Sleep(time.Hour*24*time.Duration(time.Since(startTime).Hours()*24+1) - time.Since(startTime))
 		timeOut = 0

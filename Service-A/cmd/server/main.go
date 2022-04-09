@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-	fmt.Println("поехало")
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Println("panic recovery.", r)
