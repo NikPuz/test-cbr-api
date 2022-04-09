@@ -2,7 +2,6 @@ package cbr
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -26,7 +25,7 @@ func RegisterCbrHandlers(r *mux.Router, logger *zap.Logger, service ICbrService)
 func (h cbrHandler) GetValCurs(w http.ResponseWriter, r *http.Request) {
 	jsonValCurs, err := json.Marshal(h.cbrService.GetValCurs())
 	if err != nil {
-		fmt.Println("dfgdfgdfg")
+		h.logger.Error("Error Marshal ValCurs in handler", zap.Error(err))
 	}
 
 	w.Header().Add("Content-Type", "application/json; charset=utf-8")

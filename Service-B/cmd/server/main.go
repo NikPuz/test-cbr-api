@@ -40,7 +40,6 @@ func main() {
 
 	nc.Subscribe("ValCurs", func(msg *nats.Msg) {
 		var valCurs entity.ValCurs
-		fmt.Println(string(msg.Data)) // Print
 		if err := json.Unmarshal(msg.Data, &valCurs); err != nil {
 			logger.Error("Error json.Unmarshal msg.Data", zap.Error(err))
 		}

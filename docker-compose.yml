@@ -10,7 +10,7 @@ services:
       - "4222:4222"
     hostname: nats-server
     restart: always
-
+    
   servise_a:
     container_name: "servise_a"
     env_file:

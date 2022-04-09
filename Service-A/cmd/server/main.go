@@ -20,38 +20,12 @@ func main() {
 
 	initViperConfigger(logger)
 
-	// Назначение данных локации
-	location, err := time.LoadLocation("Europe/Moscow")
-	if err != nil {
-		logger.Error("Error time.LoadLocation Europe/Moscow", zap.Error(err))
-	}
+	go startNatsGetEveryday(logger)
 
-	// // Назначение данных ежедневных запросов
-	et, err := time.ParseInLocation("15:04:05.999", viper.GetString("REQUEST_EVERYDAY"), location)
-	if err != nil {
-		logger.Error("Error ParseInLocation REQUEST_EVERYDAY", zap.Error(err))
-	}
+	go startNatsGetWithDelay(logger)
 
-	// Назначение данных запросов с задержкой
-	// delay, err := time.ParseDuration(viper.GetString("REQUEST_DELAY"))
-	// if err != nil {
-	// 	logger.Error("err ParseDuration REQUEST_DELAY", zap.Error(err))
-	// }
-
-	// Старт работы
-	if viper.GetString("REQUEST_EVERYDAY") != "" {
-		cbr_api.NatsGetEveryday(logger, et.In(location), viper.GetString("CBR_URL"))
-	}
-
-	// if viper.GetString("REQUEST_DELAY") != "" {
-	// 	cbr_api.NatsGetWithDelay(logger, delay, viper.GetString("CBR_URL"))
-	// }
 	fmt.Scanf(" ")
 }
-
-////////////////////
-////////////////////
-////////////////////
 
 func initViperConfigger(logger *zap.Logger) {
 	viper.SetConfigName("app")
@@ -66,4 +40,36 @@ func initViperConfigger(logger *zap.Logger) {
 func initZapLogger() *zap.Logger {
 	logger := zap.NewExample()
 	return logger
+}
+
+func startNatsGetEveryday(logger *zap.Logger) {
+	if viper.GetString("REQUEST_EVERYDAY") != "" {
+
+		location, _ := time.LoadLocation("Europe/Moscow")
+
+		et, err := time.ParseInLocation("15:04:05.999", viper.GetString("REQUEST_EVERYDAY"), location)
+		if err != nil {
+			logger.Error("Error ParseInLocation REQUEST_EVERYDAY", zap.Error(err))
+		}
+
+		// Начало работы
+		cbr_api.NatsGetEveryday(logger, et.In(location), viper.GetString("CBR_URL"))
+	} else {
+		logger.Info("NatsGetEveryday is off")
+	}
+}
+
+func startNatsGetWithDelay(logger *zap.Logger) {
+	if viper.GetString("REQUEST_DELAY") != "" {
+
+		delay, err := time.ParseDuration(viper.GetString("REQUEST_DELAY"))
+		if err != nil {
+			logger.Error("err ParseDuration REQUEST_DELAY", zap.Error(err))
+		}
+
+		// Начало работы
+		cbr_api.NatsGetWithDelay(logger, delay, viper.GetString("CBR_URL"))
+	} else {
+		logger.Info("NatsGetWithDelay is off")
+	}
 }

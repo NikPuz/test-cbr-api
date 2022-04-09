@@ -63,10 +63,10 @@ func NatsGetEveryday(logger *zap.Logger, requestTime time.Time, cbr_url string) 
 
 	// Если в этот день уже поздно - переносим на следующий
 	if startTime.After(requestTime) {
-		requestTime = requestTime.Add(time.Second * 5)
+		requestTime = requestTime.Add(time.Hour * 24)
 	}
+	
 	time.Sleep(time.Until(requestTime))
-
 	startTime = time.Now()
 	var timeOut int // Длительность паузы при ошибке
 	for {
@@ -104,13 +104,13 @@ func NatsGetEveryday(logger *zap.Logger, requestTime time.Time, cbr_url string) 
 
 		logger.Info("NatsGetEveryday", zap.String("message", time.Now().Format("02 Jan 06 15:04:05.999")))
 
-		time.Sleep(time.Minute*time.Duration(time.Since(startTime).Minutes()+1) - time.Since(startTime))
+		time.Sleep(time.Hour*24*time.Duration(time.Since(startTime).Hours()*24+1) - time.Since(startTime))
 		timeOut = 0
 	}
 }
 
 func getValCurse(cbr_url string) (entity.ValCurs, error) {
-	
+
 	// Запрос к CBR_URL
 	resp, err := http.Get(cbr_url)
 	if err != nil {
